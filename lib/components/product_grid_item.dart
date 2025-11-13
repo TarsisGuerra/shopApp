@@ -4,8 +4,8 @@ import 'package:shop_app/models/cart.dart';
 import 'package:shop_app/models/product.dart';
 import 'package:shop_app/utils/app_routes.dart';
 
-class ProductItem extends StatelessWidget {
-  const ProductItem({super.key});
+class ProductGridItem extends StatelessWidget {
+  const ProductGridItem({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +35,24 @@ class ProductItem extends StatelessWidget {
             style: TextStyle(fontFamily: 'Lato'),
           ),
           trailing: IconButton(
-            onPressed: () {
-              cart.addItem(product);
-            },
             icon: Icon(Icons.shopping_cart),
             color: Theme.of(context).highlightColor,
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Produto adicionado ao carrinho!'),
+                  duration: Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: 'Desfazer',
+                    onPressed: () {
+                      cart.removeSingleItem(product.id);
+                    },
+                  ),
+                ),
+              );
+              cart.addItem(product);
+            },
           ),
         ),
         child: GestureDetector(
