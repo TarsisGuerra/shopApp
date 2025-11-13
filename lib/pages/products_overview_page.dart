@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/components/app_drawer.dart';
 import 'package:shop_app/components/badgee.dart';
 import 'package:shop_app/components/product_grid.dart';
 import 'package:shop_app/models/cart.dart';
@@ -51,6 +52,7 @@ class ProductsOverviewPage extends StatelessWidget {
       ),
 
       body: ProductGrid(),
+      drawer: AppDrawer(),
     );
   }
 }
