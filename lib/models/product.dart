@@ -1,10 +1,12 @@
-class Product {
+import 'package:flutter/widgets.dart';
+
+class Product with ChangeNotifier {
   final String id;
   final String title;
   final String description;
   final double price;
   final String imageUrl;
-  bool isFavorite = false;
+  bool isFavorite;
 
   Product({
     required this.id,
@@ -17,5 +19,6 @@ class Product {
 
   void toggleFavoriteStatus() {
     isFavorite = !isFavorite;
+    notifyListeners();
   }
 }
