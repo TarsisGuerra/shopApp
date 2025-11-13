@@ -29,4 +29,8 @@ class ProductList with ChangeNotifier {
     _items.add(product);
     notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
   }
+
+  int get itemsCount {
+    return _items.length;
+  }
 }
