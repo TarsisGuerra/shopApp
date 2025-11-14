@@ -28,6 +28,25 @@ class _ProductFormPageState extends State<ProductFormPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_formData.isEmpty) {
+      final arg = ModalRoute.of(context)?.settings.arguments as Product?;
+      if (arg != null) {
+        final product = arg as Product;
+
+        _formData['id'] = arg.id;
+        _formData['name'] = arg.name;
+        _formData['description'] = arg.description;
+        _formData['price'] = arg.price;
+        _formData['imageUrl'] = arg.imageUrl;
+
+        _imageUrlController.text = arg.imageUrl;
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _priceFocus.dispose();
     _descriptionFocus.dispose();
@@ -58,10 +77,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     }
     _formKey.currentState?.save();
 
-    Provider.of<ProductList>(
-      context,
-      listen: false,
-    ).addProductFromData(_formData);
+    Provider.of<ProductList>(context, listen: false).saveProduct(_formData);
     Navigator.of(context).pop();
   }
 
@@ -79,6 +95,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
           child: ListView(
             children: [
               TextFormField(
+                initialValue: (_formData['name']?.toString()),
                 decoration: InputDecoration(labelText: 'Nome'),
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
@@ -97,6 +114,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 },
               ),
               TextFormField(
+                initialValue: (_formData['price']?.toString()),
                 decoration: InputDecoration(labelText: 'Preço'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 focusNode: _priceFocus,
@@ -116,6 +134,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 },
               ),
               TextFormField(
+                initialValue: (_formData['description']?.toString()),
                 decoration: InputDecoration(labelText: 'Descrição'),
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,

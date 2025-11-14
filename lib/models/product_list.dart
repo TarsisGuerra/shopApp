@@ -27,22 +27,36 @@ class ProductList with ChangeNotifier {
     notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
   }
 
-  void addProduct(Product product) {
-    _items.add(product);
-    notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
-  }
+  void saveProduct(Map<String, Object> data) {
+    bool hasId = data['id'] != null;
 
-  void addProductFromData(Map<String, Object> data) {
-    final newProduct = Product(
-      id: Random().nextDouble().toString(),
+    final product = Product(
+      id: hasId ? data['id'] as String : Random().nextDouble().toString(),
       name: data['name'] as String,
       description: data['description'] as String,
       price: data['price'] as double,
       imageUrl: data['imageUrl'] as String,
     );
-    addProduct(
-      newProduct,
-    ); // Notify listeners about the change to the product list and update the UI accordingly.
+
+    if (hasId) {
+      updateProduct(product);
+    } else {
+      addProduct(product);
+    }
+    // Notify listeners about the change to the product list and update the UI accordingly.
+  }
+
+  void addProduct(Product product) {
+    _items.add(product);
+    notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
+  }
+
+  void updateProduct(Product product) {
+    int index = _items.indexWhere((p) => p.id == product.id);
+    if (index >= 0) {
+      _items[index] = product;
+      notifyListeners();
+    }
   }
 
   int get itemsCount {
