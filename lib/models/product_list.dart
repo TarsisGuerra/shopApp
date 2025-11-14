@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:shop_app/data/dummy_data.dart';
 import 'package:shop_app/models/product.dart';
@@ -28,6 +30,19 @@ class ProductList with ChangeNotifier {
   void addProduct(Product product) {
     _items.add(product);
     notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
+  }
+
+  void addProductFromData(Map<String, Object> data) {
+    final newProduct = Product(
+      id: Random().nextDouble().toString(),
+      name: data['name'] as String,
+      description: data['description'] as String,
+      price: data['price'] as double,
+      imageUrl: data['imageUrl'] as String,
+    );
+    addProduct(
+      newProduct,
+    ); // Notify listeners about the change to the product list and update the UI accordingly.
   }
 
   int get itemsCount {
