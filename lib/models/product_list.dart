@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'package:shop_app/data/dummy_data.dart';
 import 'package:shop_app/models/product.dart';
 
 class ProductList with ChangeNotifier {
+  final _baseUrl = 'https://shop-app-3e7fa-default-rtdb.firebaseio.com/';
   final List<Product> _items = dummyProducts;
 
   bool _showFavoritesOnly = false;
@@ -47,6 +50,17 @@ class ProductList with ChangeNotifier {
   }
 
   void addProduct(Product product) {
+    http.post(
+      Uri.parse('$_baseUrl/products.json'),
+      body: jsonEncode({
+        'name': product.name,
+        'description': product.description,
+        'price': product.price,
+        'imageUrl': product.imageUrl,
+        'isFavorite': product.isFavorite,
+      }),
+    );
+
     _items.add(product);
     notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
   }
