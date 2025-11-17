@@ -112,7 +112,8 @@ class ProductList with ChangeNotifier {
       return;
     }
 
-    _items.clear(); // Clear the existing list before loading new products
+    _items
+        .clear(); // Clear the existing list before loading new products, if we take this line out, the products will be duplicated
 
     data.forEach((productId, productData) {
       _items.add(

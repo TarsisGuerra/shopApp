@@ -16,7 +16,6 @@ class ProductsOverviewPage extends StatefulWidget {
 }
 
 class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
-  bool _showOnlyFavorites = false;
   bool _isLoading = true;
 
   @override
@@ -34,7 +33,7 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ProductList>(context);
+    final productList = Provider.of<ProductList>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -51,9 +50,9 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
             ],
             onSelected: (selectedValue) {
               if (selectedValue == FilterOptions.favorites) {
-                _showOnlyFavorites = true;
+                productList.showFavoritesOnly();
               } else {
-                _showOnlyFavorites = false;
+                productList.showAll();
               }
             },
           ),
