@@ -30,7 +30,7 @@ class ProductList with ChangeNotifier {
     notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
   }
 
-  void saveProduct(Map<String, Object> data) {
+  Future<void> saveProduct(Map<String, Object> data) {
     bool hasId = data['id'] != null;
 
     final product = Product(
@@ -42,14 +42,14 @@ class ProductList with ChangeNotifier {
     );
 
     if (hasId) {
-      updateProduct(product);
+      return updateProduct(product);
     } else {
-      addProduct(product);
+      return addProduct(product);
     }
     // Notify listeners about the change to the product list and update the UI accordingly.
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     final future = http.post(
       Uri.parse('$_baseUrl/products.json'),
       body: jsonEncode({
@@ -61,7 +61,7 @@ class ProductList with ChangeNotifier {
       }),
     );
 
-    future.then((response) {
+    return future.then<void>((response) {
       // then is called when the HTTP POST request is complete.
       final id = jsonDecode(
         response.body,
@@ -79,12 +79,14 @@ class ProductList with ChangeNotifier {
     });
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) {
     int index = _items.indexWhere((p) => p.id == product.id);
     if (index >= 0) {
       _items[index] = product;
       notifyListeners();
     }
+
+    return Future.value();
   }
 
   void removeProduct(Product product) {
