@@ -6,8 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shop_app/models/product.dart';
 
 class ProductList with ChangeNotifier {
-  final _url =
-      'https://shop-app-3e7fa-default-rtdb.firebaseio.com/products.json';
+  final _baseUrl = 'https://shop-app-3e7fa-default-rtdb.firebaseio.com/';
   final List<Product> _items = [];
 
   bool _showFavoritesOnly = false;
@@ -54,7 +53,7 @@ class ProductList with ChangeNotifier {
     //async indicates that this function performs asynchronous operations
     final response = await http.post(
       //await waits for the HTTP POST request to complete
-      Uri.parse(_url),
+      Uri.parse('$_baseUrl/products.json'),
       body: jsonEncode({
         'name': product.name,
         'description': product.description,
@@ -81,9 +80,21 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateProduct(Product product) {
+  Future<void> updateProduct(Product product) async {
     int index = _items.indexWhere((p) => p.id == product.id);
     if (index >= 0) {
+      await http.patch(
+        Uri.parse(
+          '$_baseUrl/products/${product.id}.json',
+        ), // is used .id here to update the specific productS
+        body: jsonEncode({
+          'name': product.name,
+          'description': product.description,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+        }),
+      );
+
       _items[index] = product;
       notifyListeners();
     }
@@ -104,7 +115,7 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> loadProducts() async {
-    final response = await http.get(Uri.parse(_url));
+    final response = await http.get(Uri.parse('$_baseUrl/products.json'));
     Map<String, dynamic>? data = jsonDecode(response.body);
 
     if (data == null) {
