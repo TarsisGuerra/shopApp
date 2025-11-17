@@ -8,8 +8,29 @@ import 'package:shop_app/models/product_list.dart';
 
 enum FilterOptions { favorites, all }
 
-class ProductsOverviewPage extends StatelessWidget {
+class ProductsOverviewPage extends StatefulWidget {
   const ProductsOverviewPage({super.key});
+
+  @override
+  State<ProductsOverviewPage> createState() => _ProductsOverviewPageState();
+}
+
+class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
+  bool _showOnlyFavorites = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Carrega os produtos do Firebase ao iniciar a página
+    Provider.of<ProductList>(context, listen: false).loadProducts().then((
+      value,
+    ) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +51,9 @@ class ProductsOverviewPage extends StatelessWidget {
             ],
             onSelected: (selectedValue) {
               if (selectedValue == FilterOptions.favorites) {
-                provider.showFavoritesOnly();
+                _showOnlyFavorites = true;
               } else {
-                provider.showAll();
+                _showOnlyFavorites = false;
               }
             },
           ),
@@ -43,15 +64,14 @@ class ProductsOverviewPage extends StatelessWidget {
               },
               icon: Icon(Icons.shopping_cart),
             ),
-            builder: (ctx, cart, child) => Badgee(
-              value: cart.itemCount.toString(),
-              child: child!,
-            ), // ! to force non-null
+            builder: (ctx, cart, child) =>
+                Badgee(value: cart.itemCount.toString(), child: child!),
           ),
         ],
       ),
-
-      body: ProductGrid(),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ProductGrid(),
       drawer: AppDrawer(),
     );
   }

@@ -3,12 +3,12 @@ import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:shop_app/data/dummy_data.dart';
 import 'package:shop_app/models/product.dart';
 
 class ProductList with ChangeNotifier {
-  final _baseUrl = 'https://shop-app-3e7fa-default-rtdb.firebaseio.com/';
-  final List<Product> _items = dummyProducts;
+  final _url =
+      'https://shop-app-3e7fa-default-rtdb.firebaseio.com/products.json';
+  final List<Product> _items = [];
 
   bool _showFavoritesOnly = false;
 
@@ -27,6 +27,7 @@ class ProductList with ChangeNotifier {
 
   void showAll() {
     _showFavoritesOnly = false;
+
     notifyListeners(); // Notify listeners about the change to the product list and update the UI accordingly.
   }
 
@@ -53,7 +54,7 @@ class ProductList with ChangeNotifier {
     //async indicates that this function performs asynchronous operations
     final response = await http.post(
       //await waits for the HTTP POST request to complete
-      Uri.parse('$_baseUrl/products.json'),
+      Uri.parse(_url),
       body: jsonEncode({
         'name': product.name,
         'description': product.description,
@@ -100,5 +101,32 @@ class ProductList with ChangeNotifier {
 
   int get itemsCount {
     return _items.length;
+  }
+
+  Future<void> loadProducts() async {
+    final response = await http.get(Uri.parse(_url));
+    Map<String, dynamic>? data = jsonDecode(response.body);
+
+    if (data == null) {
+      //this if is used to handle the case when there are no products in the database
+      return;
+    }
+
+    _items.clear(); // Clear the existing list before loading new products
+
+    data.forEach((productId, productData) {
+      _items.add(
+        Product(
+          id: productId,
+          name: productData['name'],
+          description: productData['description'],
+          price: productData['price'],
+          imageUrl: productData['imageUrl'],
+          isFavorite: productData['isFavorite'],
+        ),
+      );
+    });
+
+    notifyListeners();
   }
 }
