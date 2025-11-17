@@ -83,15 +83,31 @@ class _ProductFormPageState extends State<ProductFormPage> {
       _isLoading = true;
     });
 
-    Provider.of<ProductList>(
-      context,
-      listen: false,
-    ).saveProduct(_formData).then((value) {
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
-    });
+    Provider.of<ProductList>(context, listen: false)
+        .saveProduct(_formData)
+        .catchError((error) {
+          return showDialog<void>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('Ocorreu um erro!'),
+              content: Text('Ocorreu um erro ao salvar o produto.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text('Ok'),
+                ),
+              ],
+            ),
+          );
+        })
+        .then((value) {
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.of(context).pop();
+        });
   }
 
   @override
