@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/exceptions/http_exceptions.dart';
 import 'package:shop_app/models/product.dart';
 import 'package:shop_app/models/product_list.dart';
 import 'package:shop_app/utils/app_routes.dart';
 
-class ProductItem extends StatelessWidget {
+class ProductItem extends StatefulWidget {
   const ProductItem(this.product, {super.key});
 
   final Product product;
 
   @override
+  State<ProductItem> createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
+  @override
   Widget build(BuildContext context) {
+    final msg = ScaffoldMessenger.of(context);
+
     return ListTile(
-      leading: CircleAvatar(backgroundImage: NetworkImage(product.imageUrl)),
-      title: Text(product.name),
-      trailing: Container(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(widget.product.imageUrl),
+      ),
+      title: Text(widget.product.name),
+      trailing: SizedBox(
         width: 100,
         child: Row(
           children: [
@@ -24,7 +34,7 @@ class ProductItem extends StatelessWidget {
               onPressed: () {
                 Navigator.of(
                   context,
-                ).pushNamed(AppRoutes.PRODUCTS_FORM, arguments: product);
+                ).pushNamed(AppRoutes.PRODUCTS_FORM, arguments: widget.product);
               },
             ),
             IconButton(
@@ -51,13 +61,27 @@ class ProductItem extends StatelessWidget {
                           Provider.of<ProductList>(
                             context,
                             listen: false,
-                          ).removeProduct(product);
+                          ).removeProduct(widget.product);
                         },
                         child: Text('Excluir'),
                       ),
                     ],
                   ),
-                );
+                ).then((value) async {
+                  if (value ?? false) {
+                    try {
+                      await Provider.of<ProductList>(
+                        // ignore: use_build_context_synchronously
+                        context,
+                        listen: false,
+                      ).removeProduct(widget.product);
+                    } on HttpExceptionn catch (error) {
+                      msg.showSnackBar(
+                        SnackBar(content: Text(error.toString())),
+                      );
+                    }
+                  }
+                });
               },
             ),
           ],
